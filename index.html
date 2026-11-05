@@ -37,7 +37,7 @@ button.primary:hover{background:var(--primary-hover)}
 <body>
 <header>
   <h1>PRIVATE HOUSE</h1>
-  <div id="connection">● 실시간 AI 대화 연결됨</div>
+  <div id="connection">● AI 실시간 연결 완료</div>
 </header>
 <nav>
   <button data-tab="setup" class="active">설정/입주</button>
@@ -54,8 +54,6 @@ button.primary:hover{background:var(--primary-hover)}
       <input id="playerName" value="지은">
       <label>내 직업 / 프로필</label>
       <input id="job" value="디자이너">
-      <label>인원 설정</label>
-      <select id="playerCount"><option value="4">4명 (초기 입주)</option></select>
       <button class="primary" id="start">하우스 입주 / 방 생성하기</button>
       <div id="setupNotice" class="notice hidden"></div>
     </div>
@@ -73,7 +71,7 @@ button.primary:hover{background:var(--primary-hover)}
       <label>대화 상대 선택</label>
       <select id="chatTarget">
         <option value="하우스 단체방">하우스 단체방 (훈훈한 수다)</option>
-        <option value="여자 단체방">여자 단체방 (찐친 응원/조언)</option>
+        <option value="여자 단체방">여자 단체방 (찐친 응원/고민 상담)</option>
         <option value="남자 단체방">남자 단체방 (남자들의 속마음)</option>
         <option value="박보검">박보검</option>
         <option value="차은우">차은우</option>
@@ -104,12 +102,6 @@ button.primary:hover{background:var(--primary-hover)}
       <div id="drawResult" style="margin-top:10px"></div>
     </div>
     <div class="card">
-      <h3>최종 선택</h3>
-      <select id="finalChoice"><option>아직 선택하지 않음</option></select>
-      <button id="choose" class="primary">최종 선택 완료</button>
-      <div id="finalResult" class="notice hidden"></div>
-    </div>
-    <div class="card">
       <h3>하우스 타임라인</h3>
       <div id="timeline"></div>
     </div>
@@ -119,35 +111,27 @@ button.primary:hover{background:var(--primary-hover)}
 <script>
 const $=id=>document.getElementById(id);
 
-const SUPABASE_URL = "https://mpipnrjswlnfyjaqjhhg.supabase.co";
-const SUPABASE_ANON_KEY = "Sb_publishable_CCrBRIBCcllQV58HjMF96g_IDJgs_Ox";
-let supabaseClient = null;
-
-if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-  try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){}
-}
-
 const men=['박보검','차은우','NCT WISH 유우시','서강준','최우식','남주혁'];
 const femaleNames=['서윤','하린','지우','민서','유정','채원'];
 
 // Gemini 3 Flash 지능형 맞춤 대화 API
 async function fetchAIResponse(target, userMsg, playerInfo) {
-  const apiKey = ""; // Canvas 환경 자동 런타임 주입
+  const apiKey = ""; 
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
   let systemPrompt = `당신은 인기 연애 리얼리티 '우리들의 환승연애' 출연자 '${target}'입니다.
 상대방(${playerInfo.name}, 직업: ${playerInfo.job})이 보낸 메시지: "${userMsg}"
-이 메시지에 대해 캐릭터의 성격과 말투(예: 박보검은 다정하고 설레게, 차은우는 시크하면서 다정하게 등)를 살려 카카오톡 답장처럼 한국어 1~2문장으로 아주 자연스럽게 답하세요. 절대 로봇처럼 말하지 마세요.`;
+이 메시지에 대해 캐릭터의 성격과 말투(예: 박보검은 다정하고 설레게, 차은우는 시크하면서 다정하게 등)를 살려 한국어 1~2문장으로 아주 자연스럽게 답하세요.`;
 
   if (target === '하우스 단체방') {
-    systemPrompt = `당신은 환승연애 하우스 단체방 멤버(박보검, 차은우, 하린, 지우 등) 중 한 명입니다.
-반드시 "출연자이름: 대사내용" 형식 (예: 박보검: 다들 저녁에 뭐 드실래요?)으로 훈훈하고 친근한 1문장 대답을 만드세요.`;
+    systemPrompt = `환승연애 하우스 단체방입니다. 훈훈하게 수다를 떠는 상황입니다. 
+반드시 "출연자이름: 대사내용" 형식 (예: 박보검: 다들 저녁에 뭐 먹을래요?)으로 자연스러운 일상 1문장 대답을 만드세요.`;
   } else if (target === '여자 단체방') {
-    systemPrompt = `당신은 환승연애 여자 출연자(서윤, 하린, 지우, 민서 중 1명)입니다.
-반드시 "출연자이름: 대사내용" 형식 (예: 하린: 헐 언니 대박!! 진짜야?)으로 찐친처럼 공감하고 응원하는 1문장 대답을 만드세요.`;
+    systemPrompt = `환승연애 여자 단체방(서윤, 하린, 지우 등)입니다. 여자들끼리 서로 고민을 들어주고 응원하는 찐친 모드입니다.
+반드시 "출연자이름: 대사내용" 형식 (예: 하린: 언니 마음 다 이해해, 너무 걱정마!)으로 따뜻한 조언 1문장을 만드세요.`;
   } else if (target === '남자 단체방') {
-    systemPrompt = `당신은 환승연애 남자 출연자(박보검, 차은우, 서강준, 최우식 중 1명)입니다.
-반드시 "출연자이름: 대사내용" 형식 (예: 차은우: 솔직하게 마음 가는 대로 직진합시다.)으로 남자들의 속마음 토크 1문장을 만드세요.`;
+    systemPrompt = `환승연애 남자 단체방입니다. 남자들끼리 서로의 속마음을 털어놓는 대화입니다.
+반드시 "출연자이름: 대사내용" 형식 (예: 차은우: 솔직히 긴장되는데, 직진해야지.)으로 1문장을 만드세요.`;
   }
 
   const payload = {
@@ -163,13 +147,13 @@ async function fetchAIResponse(target, userMsg, playerInfo) {
     });
     const data = await res.json();
     const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    return reply ? reply.trim() : `요즘 고민이 많았는데 네 말 들으니 힘이 나네!`;
+    return reply ? reply.trim() : `그렇구나! 나도 네 생각 하고 있었어 ㅎㅎ`;
   } catch(e) {
-    return `그렇구나! 나도 네 생각 하고 있었어 ㅎㅎ`;
+    return `응? 잠시 생각하느라 못 들었어, 다시 말해줄래?`;
   }
 }
 
-let cast=[], started=false, roomCode="LOVE1", day=1;
+let cast=[], day=1;
 function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function log(t){
   let d=document.createElement('div');
@@ -187,8 +171,6 @@ function renderCast(){
     el.querySelector('small').textContent=p.role;
     $('castList').append(el);
   });
-  $('finalChoice').innerHTML='<option>아직 선택하지 않음</option>'+cast.map(p=>'<option></option>').join('');
-  [...$('finalChoice').options].forEach((o,i)=>{if(i)o.textContent=cast[i-1].name;});
 }
 function addMessage(who,txt,me=false){
   let b=document.createElement('div');
@@ -209,16 +191,14 @@ document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{
 });
 
 $('start').onclick=()=>{
-  roomCode = $('roomCodeInput').value.trim() || 'LOVE1';
   let name = $('playerName').value.trim() || '지은';
   cast = [{name, role: ($('job').value || '디자이너') + ' · 참가자'}];
   while(cast.length < 4){
     let f = pick(femaleNames.filter(x => !cast.some(p => p.name === x)));
     cast.push({name: f, role: '여자 출연자'});
   }
-  started = true;
   renderCast();
-  addMessage('SYSTEM', '방 [' + roomCode + '] 입장 완료! 메신저에서 자유롭게 대화하세요.');
+  addMessage('SYSTEM', '하우스 입주 완료! 메신저 탭에서 대화를 시작해보세요.');
   $('setupNotice').textContent = '✅ 입주 완료! 메신저 탭으로 이동하세요.';
   $('setupNotice').classList.remove('hidden');
 };
@@ -236,7 +216,7 @@ $('send').onclick=async ()=>{
   let loadEl = document.createElement('div');
   loadEl.id = loadId;
   loadEl.className = 'bubble';
-  loadEl.innerHTML = `<div class="who">${target}</div><div>입력 중... 💬</div>`;
+  loadEl.innerHTML = `<div class="who">${target}</div><div>AI 생각 중... 💬</div>`;
   $('messages').append(loadEl);
   $('messages').scrollTop=$('messages').scrollHeight;
 
@@ -260,12 +240,6 @@ $('draw').onclick=()=>{let p=pick(men);cast.push({name:p,role:'남자 출연자'
 $('addMegi').onclick=()=>{let p=pick(femaleNames.filter(x=>!cast.some(y=>y.name===x)));cast.push({name:p,role:'메기녀'});renderCast();log('메기녀 '+p+' 등장');};
 $('newMission').onclick=()=>{day++;log('새로운 비밀 미션 도착');};
 $('secretText').onclick=()=>{addMessage('ANONYMOUS','오늘 당신에게 호감을 보낸 사람이 있습니다.');log('익명 호감 문자 수신');};
-$('choose').onclick=()=>{
-  let v=$('finalChoice').value;
-  if(v==='아직 선택하지 않음') return;
-  $('finalResult').classList.remove('hidden');
-  $('finalResult').textContent='최종 선택: '+v;
-};
 </script>
 </body>
 </html>
