@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PRIVATE HOUSE | 우리들의 환승연애</title>
+<!-- Supabase Realtime Client JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#100d10;--panel:#1c171b;--panel2:#251c22;--wine:#7d263f;--wine2:#b64b67;--cream:#f4eadf;--muted:#b8a9ae;--line:#49343d;--gold:#d7b78d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#46202f 0,transparent 38%),var(--bg);color:var(--cream);font-family:system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:12px 15px;background:#30232a;color:var(--cream)}button.primary{background:linear-gradient(135deg,var(--wine),#4b1b2c);border-color:#a64b65}button:disabled{opacity:.4;cursor:not-allowed}
+.wrap{max-width:980px;margin:auto;padding:22px 16px 60px}.top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:16px}.brand{letter-spacing:.22em;font-size:12px;color:var(--gold)}.status{font-size:11px;color:var(--muted)}h1{font-family:Georgia,serif;font-weight:500;font-size:clamp(36px,8vw,62px);letter-spacing:.04em;margin:35px 0 8px}.sub{color:var(--muted);line-height:1.7}.tag{display:inline-block;border:1px solid var(--wine2);color:#e8a9b8;border-radius:99px;padding:5px 10px;font-size:11px;letter-spacing:.12em}
+.panel{background:linear-gradient(145deg,#211920,#171217);border:1px solid var(--line);border-radius:18px;padding:20px;margin:18px 0;box-shadow:0 18px 45px #0005}.panel h2{font-size:17px;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:7px;color:var(--muted);font-size:13px}input,select{background:#120f12;border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--cream);min-width:0}.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.row>*{flex:1}.muted{color:var(--muted);font-size:12px;line-height:1.6}.tabs{display:flex;gap:7px;overflow:auto;margin:20px 0}.tabs button{white-space:nowrap}.tabs button.active{background:var(--wine);border-color:var(--wine2)}.screen{display:none}.screen.active{display:block}.cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.person{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;min-height:130px}.avatar{height:78px;border-radius:10px;background:linear-gradient(135deg,#583041,#1a1319);display:grid;place-items:center;font-family:Georgia,serif;font-size:27px;color:#e6c6c8;margin-bottom:10px}.person b{display:block}.person small{color:var(--muted)}.chatbox{background:#b8c9d6;color:#24252a;border-radius:15px;padding:14px;min-height:280px;max-height:420px;overflow:auto}.bubble{max-width:84%;padding:10px 12px;border-radius:13px;margin:8px 0;background:#fff;color:#222;font-size:14px;line-height:1.4}.bubble.me{margin-left:auto;background:#f9e28b}.bubble .who{font-size:10px;color:#786c6c;margin-bottom:4px;font-weight:bold}.chat-input{display:flex;gap:8px;margin-top:10px}.chat-input input{flex:1}.event{border-left:3px solid var(--wine2);padding:10px 13px;background:#211920;margin:9px 0;border-radius:0 10px 10px 0}.event strong{color:#e5a9b8}.hidden{display:none!important}.notice{padding:12px;border:1px dashed var(--gold);border-radius:12px;color:#e6d2b5;font-size:12px;line-height:1.6}.footer{margin-top:30px;text-align:center;color:#887981;font-size:11px;line-height:1.8}
+@media(max-width:560px){.wrap{padding:16px 12px 40px}.panel{padding:16px}h1{margin-top:26px}.top{align-items:flex-start}}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div class="brand">PRIVATE HOUSE · SEASON 01</div><div class="status" id="connection">● Supabase 실시간 연동됨</div></header>
+<h1>LOVE, AGAIN?</h1><p class="sub">끝난 사랑과 시작되는 마음 사이.<br>우리만의 비밀스러운 연애 리얼리티가 시작됩니다.</p>
+<div class="tag">A PRIVATE DATING REALITY</div>
+
+<section class="panel" id="setup">
+<h2>01 / 입주 및 방 참여</h2>
+<div class="grid">
+<label class="field">방 코드 (친구와 함께 입력)<input id="roomCodeInput" placeholder="예: LOVE1" maxlength="10"></label>
+<label class="field">참가할 실제 친구 수<select id="playerCount"><option value="2">2명</option><option value="3">3명</option><option value="4">4명</option></select></label>
+<label class="field">내 이름<input id="playerName" placeholder="화면에 표시할 이름" maxlength="12"></label>
+<label class="field">나의 직업<select id="job"><option>연구직</option><option>마케터</option><option>자영업자</option><option>프리랜서</option></select></label>
+</div><div style="height:14px"></div>
+<div class="row">
+<button class="primary" id="start">하우스 입주 / 방 생성하기</button>
+</div>
+<p class="muted">동일한 방 코드를 입력하면 각자의 휴대폰에서 실시간으로 대화가 연결됩니다.</p>
+</section>
+
+<nav class="tabs" id="tabs"><button class="active" data-tab="home">하우스</button><button data-tab="cast">입주자</button><button data-tab="chat">메신저</button><button data-tab="mission">오늘의 미션</button><button data-tab="final">최종 선택</button></nav>
+
+<section class="screen active" id="home">
+<div class="panel"><span class="tag">HOUSE STATUS</span><h2 style="margin-top:12px">오늘, 새로운 관계가 시작됩니다.</h2><p class="sub" id="welcome">먼저 입주 정보를 입력해 주세요.</p><div class="row"><button id="draw">오늘의 남자 랜덤 캐스팅</button><button id="addMegi">메기녀 등장 이벤트</button></div><div id="drawResult" style="margin-top:14px"></div></div>
+<div class="panel"><h2>하우스 타임라인</h2><div id="timeline"><div class="event">입주 준비가 완료되면 첫 일정이 시작됩니다.</div></div></div>
+</section>
+
+<section class="screen" id="cast"><div class="panel"><h2>오늘의 입주자</h2><div class="cast" id="castList"></div><p class="muted">남자 출연자 캐스팅 풀: 박보검, 차은우, NCT WISH 유우시, 서강준, 최우식, 남주혁.</p></div></section>
+
+<section class="screen" id="chat">
+<div class="panel">
+<h2>PRIVATE TALK</h2>
+<label class="field">대화 채널 선택
+<select id="chatTarget">
+<option value="하우스 단체방">💬 하우스 단체방 (전원 참가)</option>
+<optgroup label="💘 남자 출연자">
+<option value="박보검">박보검</option>
+<option value="차은우">차은우</option>
+<option value="NCT WISH 유우시">NCT WISH 유우시</option>
+<option value="서강준">서강준</option>
+<option value="최우식">최우식</option>
+<option value="남주혁">남주혁</option>
+</optgroup>
+<optgroup label="👩 가상 여자 출연자">
+<option value="서윤">서윤 (차분·팩폭)</option>
+<option value="하린">하린 (활발·투정)</option>
+<option value="지우">지우 (걸크러시)</option>
+<option value="민서">민서 (도도·비꼬기)</option>
+<option value="유정">유정 (메기녀)</option>
+<option value="채원">채원 (메기녀)</option>
+</optgroup>
+</select>
+</label>
+<div style="height:12px"></div>
+<div class="chatbox" id="messages"><div class="bubble"><div class="who">SYSTEM</div>입주자들과 실시간 대화를 시작해 보세요.</div></div>
+<div class="chat-input"><input id="messageInput" placeholder="메시지를 입력해 주세요"><button class="primary" id="send">전송</button></div>
+</div>
+</section>
+
+<section class="screen" id="mission"><div class="panel"><h2>오늘의 미션</h2><div id="missionText" class="event"><strong>첫인상 선택</strong><br>가장 대화해 보고 싶은 사람을 선택하세요.</div><div class="row"><button id="newMission">새 미션 뽑기</button><button id="secretText">익명 호감 문자 보내기</button><button id="reveal">비밀 공개 이벤트</button></div></div></section>
+
+<section class="screen" id="final"><div class="panel"><h2>FINAL CHOICE</h2><p class="sub">마지막 밤, 나의 마음이 향하는 곳은?</p><label class="field">최종 선택<select id="finalChoice"><option>아직 선택하지 않음</option></select></label><div style="height:12px"></div><button class="primary" id="choose">최종 선택 확정</button><div id="finalResult" class="notice hidden" style="margin-top:12px"></div></div></section>
+
+<div class="footer">PRIVATE HOUSE · UNOFFICIAL FAN-MADE GAME CONCEPT</div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+
+// Supabase 연동 키 세팅
+const SUPABASE_URL = "https://mpipnrjswlnfyjaqjhhg.supabase.co";
+const SUPABASE_ANON_KEY = "Sb_publishable_CCrBRIBCcllQV58HjMF96g_IDJgs_Ox";
+let supabaseClient = null;
+
+if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+const men=['박보검','차은우','NCT WISH 유우시','서강준','최우식','남주혁'];
+const femaleNames=['서윤','하린','지우','민서','유정','채원'];
+
+const characterPersonalities = {
+  '박보검': { tone: '다정하고 친절함. 서운한 상황에서는 섭섭함을 조용히 표현', reactions: ['아까는 사람 많아서 얘기 못 했는데... 조금 서운했어요.', '오늘 네 말이 이상하게 계속 생각나더라.', '너 딴 사람한테 웃어줄 때 솔직히 좀 질투 났어.'] },
+  '차은우': { tone: '단호하고 직진적. 오해나 싸움이 발생하면 서늘하고 냉철함', reactions: ['솔직히 말해줘. 나한테 마음이 전혀 없는 거야?', '아까 다른 사람이랑 얘기하는 거 보고 좀 차가워지더라고.', '난 내 마음 정했어. 너는 어때?'] },
+  'NCT WISH 유우시': { tone: '귀엽고 엉뚱함. 억울하면 찡얼거리거나 툴툴거림', reactions: ['나한테 왜 그래... 나 진짜 억울하단 말이야!', '너 나한테 관심 없지? 다 티 나거든!', '아까 나 말고 다른 사람 먼저 챙겨줘서 삐쳤어.'] },
+  '서강준': { tone: '지적이고 멜로 감성. 뼈 있는 질투를 건넸음', reactions: ['그렇게 웃어주면 내가 착각하게 되잖아.', '너랑 대화할수록 마음이 자꾸 복잡해진다.', '괜찮은 척하려고 했는데... 나 별로 안 괜찮아.'] },
+  '최우식': { tone: '위트 있고 당황하면 어버버하지만 솔직함', reactions: ['어... 아까 그 상황 약간 당황스러웠는데, 내 착각인가?', '나 지금 완전 멘붕이야. 너 나 놀리는 거지?', '솔직히 마음 들켜서 부끄러운데, 계속 신경 쓰여.'] },
+  '남주혁': { tone: '청춘 직진남. 불의나 오해에 확실하게 화를 냄', reactions: ['그건 네가 오해한 거야. 내 말 제대로 들어봐.', '나 더 이상 마음 안 숨기려고. 너 나 어떻게 생각해?', '짜증 나게 자꾸 사람 마음 흔들지 마라.'] },
+  '서윤': { tone: '차분하고 단도직입적인 팩폭 스타일', reactions: ['우리 서로 솔직해지자. 눈치 보는 거 답답해.', '너 아까 행동 좀 선 넘었던 거 알아?'] },
+  '하린': { tone: '밝고 활발하지만 서운하면 툴툴거림', reactions: ['진짜 어이없어! 나한테는 한 번도 그렇게 안 웃어줬잖아!', '나만 진심이었던 거야? 서운하다 진짜.'] },
+  '지우': { tone: '걸크러시. 싸우면 직설적으로 맞불 놓음', reactions: ['할 말 있으면 겉으로 해. 뒤에서 표정 관리하지 말고.', '나 원래 참는 성격 아닌 거 알지?'] },
+  '민서': { tone: '도도하고 비꼬는 스타일', reactions: ['어머, 둘이 아주 타이밍이 대단하네? 재밌다 정말.', '마음대로 해. 어차피 관심도 없었어.'] }
+};
+
+const chatLines = {
+  '하우스 단체방': ['다들 저녁 같이 먹어요! 구경만 하지 말구.', '아까 둘이 분위기 심상치 않던데 무슨 얘기 했어?', '오늘 밤에 익명 호감 편지 쓰는 시간 있대요!'],
+};
+
+let cast=[], started=false, day=1, roomCode="LOVE1";
+
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function log(t){let d=document.createElement('div');d.className='event';d.innerHTML='<strong>DAY '+day+'</strong><br>'+t;$('timeline').prepend(d)}
+
+function renderCast(){
+  $('castList').innerHTML='';
+  cast.forEach(p=>{
+    let el=document.createElement('div');
+    el.className='person';
+    el.innerHTML='<div class="avatar">'+p.name.slice(0,1)+'</div><b></b><small></small>';
+    el.querySelector('b').textContent=p.name;
+    el.querySelector('small').textContent=p.role;
+    $('castList').append(el);
+  });
+  $('finalChoice').innerHTML='<option>아직 선택하지 않음</option>'+cast.map(p=>'<option></option>').join('');
+  [...$('finalChoice').options].forEach((o,i)=>{if(i)o.textContent=cast[i-1].name;});
+}
+
+function addMessage(who,txt,me=false){
+  let b=document.createElement('div');
+  b.className='bubble'+(me?' me':'');
+  let n=document.createElement('div');
+  n.className='who';
+  n.textContent=who;
+  let t=document.createElement('div');
+  t.textContent=txt;
+  b.append(n,t);
+  $('messages').append(b);
+  $('messages').scrollTop=$('messages').scrollHeight;
+}
+
+// Supabase 실시간 수신 설정
+function initRealtime() {
+  if(!supabaseClient) return;
+  supabaseClient
+    .channel('public:messages')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+      const msg = payload.new;
+      if (msg.room_code === roomCode && msg.sender_name !== ($('playerName').value.trim()||'나')) {
+        addMessage(msg.sender_name, msg.content, false);
+      }
+    })
+    .subscribe();
+}
+
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));
+});
+
+$('start').onclick=()=>{
+  roomCode = $('roomCodeInput').value.trim() || 'LOVE1';
+  let name=$('playerName').value.trim()||'나';
+  let n=+$('playerCount').value;
+  cast=[{name,role:$('job').value+' · 실제 참가자'}];
+  while(cast.length<4){
+    let f=pick(femaleNames.filter(x=>!cast.some(p=>p.name===x)));
+    cast.push({name:f,role:'가상 여자 출연자'});
+  }
+  started=true;
+  $('welcome').textContent='방 코드 ['+roomCode+'] · 여자 출연자 4명 입주 완료.';
+  renderCast();
+  log('방 ['+roomCode+']에 입주 완료. X 관계는 아직 비공개입니다.');
+  addMessage('SYSTEM','방 코드 ['+roomCode+'] 입장 완료! 친구들과 대화를 시작하세요.');
+  initRealtime();
+};
+
+$('draw').onclick=()=>{
+  if(!started)return alert('먼저 입주 준비를 완료해 주세요.');
+  let p=pick(men);
+  cast.push({name:p,role:'남자 출연자 · 랜덤 캐스팅'});
+  $('drawResult').innerHTML='<div class="person"><div class="avatar">♥</div><b>'+p+'</b><small>NEW MALE CASTING</small></div>';
+  renderCast();
+  log('새로운 남자 출연자 '+p+' 님이 입주했습니다.');
+};
+
+$('addMegi').onclick=()=>{
+  if(!started)return alert('먼저 입주 준비를 완료해 주세요.');
+  let p=pick(femaleNames.filter(x=>!cast.some(y=>y.name===x)));
+  cast.push({name:p,role:'메기녀 · 중간 투입'});
+  renderCast();
+  log('🚨 메기녀 '+p+' 님이 등장했습니다.');
+};
+
+$('send').onclick=async ()=>{
+  let v=$('messageInput').value.trim();
+  if(!v)return;
+  let myName = $('playerName').value.trim()||'나';
+  addMessage(myName, v, true);
+  $('messageInput').value='';
+
+  // Supabase에 데이터 전송
+  if(supabaseClient) {
+    await supabaseClient.from('messages').insert([
+      { room_code: roomCode, sender_name: myName, content: v, channel: $('chatTarget').value }
+    ]);
+  }
+
+  let target=$('chatTarget').value;
+  setTimeout(()=>{
+    if(target === '하우스 단체방') {
+      let r1 = pick(men);
+      let r2 = pick(femaleNames);
+      addMessage(r1, pick(characterPersonalities[r1].reactions));
+      setTimeout(()=> addMessage(r2, pick(characterPersonalities[r2].reactions)), 1200);
+    } else if (characterPersonalities[target]) {
+      addMessage(target, pick(characterPersonalities[target].reactions));
+    }
+  }, 800);
+};
+
+$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('send').click()});
+$('newMission').onclick=()=>{day++;log('새로운 미션이 도착했습니다.')};
+$('secretText').onclick=()=>{addMessage('ANONYMOUS','오늘 당신을 가장 많이 생각한 사람이 있습니다.');log('익명 호감 문자가 도착했습니다.')};
+$('reveal').onclick=()=>{log('🔥 드라마틱한 비밀 공개 이벤트가 발생했습니다.')};
+$('choose').onclick=()=>{
+  let v=$('finalChoice').value;
+  if(v==='아직 선택하지 않음')return alert('최종 선택 상대를 골라 주세요.');
+  $('finalResult').classList.remove('hidden');
+  $('finalResult').textContent='당신의 최종 선택: '+v;
+};
+</script>
+</body>
+</html>
