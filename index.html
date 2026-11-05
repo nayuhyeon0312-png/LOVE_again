@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>환승연애 : 하우스 메신저</title>
+<title>환승연애 : 실시간 하우스 메신저</title>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
@@ -14,7 +14,7 @@
       <span class="text-rose-500 font-black text-lg tracking-wider">♥ TRANSIT LOVE</span>
     </div>
     <div id="statusBadge" class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium">
-      ● 시스템 정상 대기중
+      ● 실시간 연동 준비중
     </div>
   </header>
 
@@ -28,51 +28,58 @@
   <!-- 메인 컨테이너 -->
   <main class="flex-1 max-w-md w-full mx-auto p-4 flex flex-col">
 
-    <!-- 1. 설정/입주 화면 -->
+    <!-- 1. 설정/입주 화면 (방 코드 입력으로 친구와 동시 접속 가능) -->
     <section id="screen-setup" class="space-y-4">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
         <h2 class="text-base font-bold text-slate-200 mb-4 flex items-center gap-2">
-          <span>🏠 하우스 프로필 설정</span>
+          <span>🏠 하우스 프로필 &amp; 방 설정</span>
         </h2>
         
         <div class="space-y-3">
           <div>
+            <label class="text-xs text-slate-400 block mb-1">방 코드 (친구와 똑같이 입력하세요)</label>
+            <input type="text" id="inputRoom" value="LOVE1004" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-rose-500 uppercase font-mono tracking-widest">
+          </div>
+          <div>
             <label class="text-xs text-slate-400 block mb-1">내 닉네임</label>
-            <input type="text" id="inputName" value="지은" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-rose-500">
+            <input type="text" id="inputName" value="유현" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-rose-500">
           </div>
           <div>
             <label class="text-xs text-slate-400 block mb-1">내 직업 및 소개</label>
             <input type="text" id="inputJob" value="디자이너" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-rose-500">
           </div>
           <button onclick="enterHouse()" class="w-full mt-2 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl transition shadow-lg shadow-rose-500/25">
-            하우스 입주하기 🚀
+            하우스 입주 / 방 입장하기 🚀
           </button>
         </div>
       </div>
       
       <div class="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-4 text-xs text-rose-300 leading-relaxed">
-        💡 <b>안내:</b> 입주하기를 누르면 박보검, 차은우 등 멋진 출연진들이 기다리고 있는 메신저 탭으로 즉시 이동합니다!
+        💡 <b>친구와 동시 접속 팁:</b> 친구 스마트폰에서도 똑같은 <b>방 코드(예: LOVE1004)</b>를 입력하고 입장하면, 서로 실시간으로 대화를 주고받을 수 있습니다! AI 출연진들도 언제든 대화에 참여합니다.
       </div>
     </section>
 
     <!-- 2. 메신저 화면 -->
     <section id="screen-messenger" class="hidden flex-1 flex flex-col">
-      <!-- 대화 상대 선택바 -->
+      <!-- 대화 상대 및 방 정보 바 -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 mb-3 flex items-center justify-between">
-        <span class="text-xs text-slate-400 font-medium">대화 상대</span>
+        <div class="flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="roomTitleDisplay" class="text-xs font-bold text-slate-200">방: LOVE1004</span>
+        </div>
         <select id="chatTarget" onchange="changeTarget()" class="bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-rose-500">
           <option value="하우스 단체방">💬 하우스 단체방</option>
-          <option value="박보검">👤 박보검</option>
-          <option value="차은우">👤 차은우</option>
-          <option value="NCT WISH 유우시">👤 NCT WISH 유우시</option>
-          <option value="서강준">👤 서강준</option>
-          <option value="하린">👤 하린 (여자 출연자)</option>
+          <option value="박보검">👤 박보검 (출연진)</option>
+          <option value="차은우">👤 차은우 (출연진)</option>
+          <option value="NCT WISH 유우시">👤 NCT WISH 유우시 (출연진)</option>
+          <option value="서강준">👤 서강준 (출연진)</option>
+          <option value="연주">👤 연주 (출연진)</option>
         </select>
       </div>
 
       <!-- 채팅 대화창 -->
       <div id="chatBox" class="flex-1 bg-slate-900 border border-slate-800 rounded-2xl p-4 mb-3 h-[380px] overflow-y-auto space-y-3 flex flex-col">
-        <!-- 메시지들이 여기에 동적으로 추가됩니다 -->
+        <!-- 메시지들이 동적으로 렌더링됩니다 -->
       </div>
 
       <!-- 메시지 입력창 -->
@@ -85,45 +92,49 @@
     <!-- 3. 입주자 현황 화면 -->
     <section id="screen-house" class="hidden space-y-3">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <h3 class="text-sm font-bold text-slate-200 mb-3">✨ 현재 하우스 입주 멤버</h3>
+        <h3 class="text-sm font-bold text-slate-200 mb-3">✨ 현재 하우스 멤버</h3>
         <div id="memberList" class="grid grid-cols-2 gap-2.5">
-          <!-- 멤버 카드가 여기에 들어갑니다 -->
+          <!-- 멤버 카드들 -->
         </div>
       </div>
     </section>
 
   </main>
 
-<script>
-// 기본 데이터
-let myProfile = { name: "지은", job: "디자이너" };
-let currentTarget = "하우스 단체방";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-// 대화 내용 저장소 (상대방별로 대화 기록 유지)
-let chatHistories = {
-  "하우스 단체방": [
-    { sender: "SYSTEM", text: "하우스에 오신 것을 환영합니다! 첫 인사를 건네보세요." },
-    { sender: "박보검", text: "다들 오늘 하루 고생했어요! 저녁 뭐 먹을래요? ㅎㅎ" }
-  ],
-  "박보검": [
-    { sender: "박보검", text: "안녕 지은아! 오늘 하우스 분위기 어때?" }
-  ],
-  "차은우": [
-    { sender: "차은우", text: "방금 촬영 끝났어. 다들 뭐 하고 있나?" }
-  ],
-  "NCT WISH 유우시": [
-    { sender: "유우시", text: "안녕하세요! 오늘 날씨 진짜 좋다 그쵸?" }
-  ],
-  "서강준": [
-    { sender: "서강준", text: "나 커피 한 잔 마시러 가려는데 같이 갈래요?" }
-  ],
-  "하린": [
-    { sender: "하린", text: "언니 오늘 의상 너무 예쁘다! 어디서 샀어?" }
-  ]
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'transit-love-room-default';
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+  apiKey: "AIzaSyDummyKeyForFallbackModeOnly999",
+  authDomain: "transit-love.firebaseapp.com",
+  projectId: "transit-love-demo"
 };
 
-// 탭 전환 기능
-function switchTab(tabId) {
+let db = null;
+let auth = null;
+let unsubMessages = null;
+
+let myProfile = { room: "LOVE1004", name: "유현", job: "디자이너" };
+let currentTarget = "하우스 단체방";
+let localChatCache = {};
+
+// Firebase 초기화 시도 (오프라인/로컬인 경우 자동 백업 모드로 안전 작동)
+try {
+  const app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  db = getFirestore(app);
+  signInAnonymously(auth).then(() => {
+    document.getElementById('statusBadge').className = "text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-medium";
+    document.getElementById('statusBadge').textContent = "● 실시간 연동 완료!";
+  }).catch(() => {});
+} catch(e) {
+  document.getElementById('statusBadge').textContent = "● 로컬 모드 작동중";
+}
+
+window.switchTab = function(tabId) {
   ['setup', 'messenger', 'house'].forEach(id => {
     document.getElementById('screen-' + id).classList.add('hidden');
     document.getElementById('tab-' + id).className = "flex-1 py-3 font-medium text-slate-400 hover:text-slate-200 transition border-b-2 border-transparent";
@@ -131,35 +142,178 @@ function switchTab(tabId) {
   document.getElementById('screen-' + tabId).classList.remove('hidden');
   document.getElementById('tab-' + tabId).className = "flex-1 py-3 font-bold text-rose-500 border-b-2 border-rose-500 transition";
   
-  if(tabId === 'messenger') renderMessages();
+  if(tabId === 'messenger') {
+    document.getElementById('roomTitleDisplay').textContent = `방: ${myProfile.room}`;
+    initRealtimeChat();
+  }
   if(tabId === 'house') renderMembers();
 }
 
-// 하우스 입주하기 버튼
-function enterHouse() {
-  myProfile.name = document.getElementById('inputName').value.trim() || "지은";
+window.enterHouse = function() {
+  myProfile.room = document.getElementById('inputRoom').value.trim().toUpperCase() || "LOVE1004";
+  myProfile.name = document.getElementById('inputName').value.trim() || "유현";
   myProfile.job = document.getElementById('inputJob').value.trim() || "디자이너";
   switchTab('messenger');
 }
 
-// 대화 상대 변경
-function changeTarget() {
+window.changeTarget = function() {
   currentTarget = document.getElementById('chatTarget').value;
   renderMessages();
 }
 
-// 화면에 메시지 렌더링
+// 실시간 대화 수신 (Firestore 연동 또는 로컬 메모리 폴백)
+function initRealtimeChat() {
+  if (unsubMessages) {
+    unsubMessages();
+  }
+
+  if (db && auth && auth.currentUser) {
+    try {
+      const q = query(collection(db, 'artifacts', appId, 'public', 'data', `room_${myProfile.room}_messages`));
+      unsubMessages = onSnapshot(q, (snapshot) => {
+        let msgs = [];
+        snapshot.forEach(docSnap => {
+          msgs.push(docSnap.data());
+        });
+        // 시간순 정렬
+        msgs.sort((a, b) => (a.time || 0) - (b.time || 0));
+        
+        if (msgs.length === 0) {
+          // 초기 환영 메시지 추가
+          addInitialMessage();
+        } else {
+          localChatCache[currentTarget] = msgs;
+          renderMessages();
+        }
+      }, (err) => {
+        initLocalFallback();
+      });
+      return;
+    } catch(e) {
+      initLocalFallback();
+    }
+  } else {
+    initLocalFallback();
+  }
+}
+
+function initLocalFallback() {
+  if (!localChatCache[currentTarget]) {
+    localChatCache[currentTarget] = [
+      { sender: "SYSTEM", text: `[방 코드: ${myProfile.room}] 입장 완료! 자유롭게 대화를 시작해 보세요.`, time: Date.now() },
+      { sender: "박보검", text: "다들 오늘 저녁은 뭐 먹을래요? 제가 맛있는 거 만들게요!", time: Date.now() + 1 }
+    ];
+  }
+  renderMessages();
+}
+
+function addInitialMessage() {
+  if (db && auth && auth.currentUser) {
+    try {
+      addDoc(collection(db, 'artifacts', appId, 'public', 'data', `room_${myProfile.room}_messages`), {
+        sender: "SYSTEM",
+        text: `[방 코드: ${myProfile.room}] 하우스 입주 완료! 메신저에서 대화를 시작해 보세요.`,
+        time: Date.now()
+      });
+    } catch(e) {
+      initLocalFallback();
+    }
+  }
+}
+
+// 메시지 전송
+window.sendMessage = async function() {
+  const input = document.getElementById('messageInput');
+  const text = input.value.trim();
+  if(!text) return;
+
+  const msgData = {
+    sender: myProfile.name,
+    text: text,
+    target: currentTarget,
+    time: Date.now()
+  };
+
+  input.value = '';
+
+  // Firestore 저장 또는 로컬 캐시 저장
+  if (db && auth && auth.currentUser) {
+    try {
+      await addDoc(collection(db, 'artifacts', appId, 'public', 'data', `room_${myProfile.room}_messages`), msgData);
+    } catch(e) {
+      saveLocalAndReply(msgData);
+    }
+  } else {
+    saveLocalAndReply(msgData);
+  }
+
+  // AI 출연진이 내 말에 맥락 있게 센스 있는 반응 생성
+  setTimeout(() => {
+    triggerSmartAIResponse(text);
+  }, 900);
+}
+
+function saveLocalAndReply(msgData) {
+  if(!localChatCache[currentTarget]) localChatCache[currentTarget] = [];
+  localChatCache[currentTarget].push(msgData);
+  renderMessages();
+}
+
+// 질문 내용과 키워드를 분석하여 훨씬 자연스럽고 찰떡같이 대답하는 지능형 응답 생성기
+function triggerSmartAIResponse(userMsg) {
+  const lower = userMsg.toLowerCase();
+  let responder = currentTarget === "하우스 단체방" ? ['박보검', '차은우', '서강준', '연주'][Math.floor(Math.random() * 4)] : currentTarget;
+  
+  let replyText = "";
+
+  if (lower.includes('안녕') || lower.includes('하이') || lower.includes('반가워')) {
+    replyText = `반가워 ${myProfile.name}야! 오늘 컨디션은 어때 보여? ㅎㅎ`;
+  } else if (lower.includes('뭐해') || lower.includes('뭐함') || lower.includes('뭐 하')) {
+    replyText = `난 지금 거실에서 다들 뭐 하나 구경 중이었지~ ${myProfile.name}는 뭐 하고 있었어?`;
+  } else if (lower.includes('밥') || lower.includes('메뉴') || lower.includes('먹') || lower.includes('떡볶이') || lower.includes('치킨')) {
+    replyText = `오! 방금 그 메뉴 완전 찬성인데? 나도 그거 엄청 좋아해 😋`;
+  } else if (lower.includes('좋아') || lower.includes('사랑') || lower.includes('멋져') || lower.includes('예뻐') || lower.includes('잘생겼')) {
+    replyText = `그런 말 들으니까 갑자기 심쿵하잖아... 고마워 ${myProfile.name} 😳`;
+  } else if (lower.includes('누구') || lower.includes('마음') || lower.includes('선택')) {
+    replyText = `음... 아직은 잘 모르겠어. 오늘 저녁 데이트 전까지는 비밀이야 😉`;
+  } else {
+    const contextualReplies = [
+      `오! ${myProfile.name} 말이 정말 맞는 것 같아. 내 생각도 딱 그래!`,
+      `진짜? 방금 그 얘기 듣고 나니까 ${myProfile.name}한테 더 관심이 가네 ㅎㅎ`,
+      `에이 설마~ 진짜 그렇게 생각하는 거야? 자세히 얘기해줘!`,
+      `오늘 하우스 분위기 왜 이렇게 재밌냐 ㅋㅋ 너 덕분이야!`
+    ];
+    replyText = contextualReplies[Math.floor(Math.random() * contextualReplies.length)];
+  }
+
+  const aiMsgData = {
+    sender: responder,
+    text: replyText,
+    target: currentTarget,
+    time: Date.now()
+  };
+
+  if (db && auth && auth.currentUser) {
+    try {
+      addDoc(collection(db, 'artifacts', appId, 'public', 'data', `room_${myProfile.room}_messages`), aiMsgData);
+    } catch(e) {
+      saveLocalAndReply(aiMsgData);
+    }
+  } else {
+    saveLocalAndReply(aiMsgData);
+  }
+}
+
+// 화면에 메시지 그려주기
 function renderMessages() {
   const box = document.getElementById('chatBox');
   box.innerHTML = '';
   
-  if (!chatHistories[currentTarget]) {
-    chatHistories[currentTarget] = [
-      { sender: currentTarget, text: `안녕! 반가워 ${myProfile.name}야.` }
-    ];
-  }
+  let msgs = localChatCache[currentTarget] || [
+    { sender: "SYSTEM", text: `[방 코드: ${myProfile.room}] 입장 완료!`, time: Date.now() }
+  ];
 
-  chatHistories[currentTarget].forEach(msg => {
+  msgs.forEach(msg => {
     const isMe = msg.sender === myProfile.name;
     const isSystem = msg.sender === 'SYSTEM';
     
@@ -170,13 +324,13 @@ function renderMessages() {
     } else if (isMe) {
       div.className = "flex flex-col items-end";
       div.innerHTML = `
-        <span class="text-[10px] text-slate-500 mb-1 mr-1">${msg.sender}</span>
+        <span class="text-[10px] text-slate-500 mb-1 mr-1">${msg.sender} (나)</span>
         <div class="bg-rose-500 text-white text-xs px-3.5 py-2.5 rounded-2xl rounded-tr-none max-w-[80%] shadow-md leading-relaxed">${msg.text}</div>
       `;
     } else {
       div.className = "flex flex-col items-start";
       div.innerHTML = `
-        <span class="text-[10px] text-slate-400 mb-1 ml-1 font-medium">${msg.sender}</span>
+        <span class="text-[10px] text-rose-400 mb-1 ml-1 font-bold">${msg.sender}</span>
         <div class="bg-slate-800 text-slate-200 text-xs px-3.5 py-2.5 rounded-2xl rounded-tl-none max-w-[80%] shadow-md border border-slate-700/50 leading-relaxed">${msg.text}</div>
       `;
     }
@@ -185,65 +339,10 @@ function renderMessages() {
   box.scrollTop = box.scrollHeight;
 }
 
-// 메시지 전송 및 자동 답장 로직
-function sendMessage() {
-  const input = document.getElementById('messageInput');
-  const text = input.value.trim();
-  if(!text) return;
-
-  // 내 메시지 추가
-  chatHistories[currentTarget].push({ sender: myProfile.name, text: text });
-  input.value = '';
-  renderMessages();
-
-  // 상대방의 스마트한 자동 반응 생성
-  setTimeout(() => {
-    let replyText = generateSmartReply(currentTarget, text);
-    chatHistories[currentTarget].push({ sender: currentTarget, text: replyText });
-    renderMessages();
-  }, 700);
-}
-
-// 입력한 내용에 따라 센스 있게 반응하는 답장 생성기
-function generateSmartReply(target, userMsg) {
-  const lower = userMsg.toLowerCase();
-  
-  if (target === '하우스 단체방') {
-    const randomMember = ['박보검', '차은우', '서강준', '하린'][Math.floor(Math.random() * 4)];
-    if (lower.includes('안녕') || lower.includes('하이')) return `${randomMember}: 다들 반가워요! 오늘 저녁 메뉴 추천 좀 해줘요 ㅋㅋ`;
-    if (lower.includes('뭐해') || lower.includes('뭐함')) return `${randomMember}: 난 지금 거실 쇼파에서 쉬는 중! 다들 뭐해요?`;
-    return `${randomMember}: 오 그 얘기 들었어요? 오늘 저녁에 비밀 데이트 공지 뜬대요!`;
-  }
-
-  // 개인 1:1 대화 맞춤형 답변
-  if (lower.includes('안녕') || lower.includes('하이')) {
-    return `안녕 ${myProfile.name}야! 오늘 하루 종일 네 생각 하고 있었는데 마침 잘 왔다 ㅎㅎ`;
-  }
-  if (lower.includes('뭐해') || lower.includes('뭐함')) {
-    return `잠깐 쉬고 있었지~ ${myProfile.name} 너는 뭐 하고 있었어? 이따 같이 산책 갈래?`;
-  }
-  if (lower.includes('좋아') || lower.includes('사랑') || lower.includes('멋져')) {
-    return `갑자기 그런 말 하니까 엄청 떨리잖아.. 고마워, 나도 네가 신경 쓰여. 😳`;
-  }
-  if (lower.includes('밥') || lower.includes('배고파') || lower.includes('먹') || lower.includes('카페')) {
-    return `오! 맛있는 거 먹으러 가고 싶다. 이따 나랑 단둘이 맛집 갈래?`;
-  }
-
-  // 기본 리액션
-  const defaultReplies = [
-    `정말? 헤헤 ${myProfile.name} 말이 다 맞는 것 같아!`,
-    `오 ㅎㅎ 오늘 그 얘기 들으니까 기분 좋아지네. 내일도 기대된다!`,
-    `음... 나는 네가 그렇게 말해줄 때마다 솔직히 설레더라.`,
-    `진짜? 나도 똑같이 생각하고 있었는데 통했네! 😆`
-  ];
-  return defaultReplies[Math.floor(Math.random() * defaultReplies.length)];
-}
-
-// 입주자 목록 렌더링
-function renderMembers() {
+window.renderMembers = function() {
   const list = document.getElementById('memberList');
   const members = [
-    { name: myProfile.name, role: myProfile.job + " (참가자)", badge: "나" },
+    { name: myProfile.name, role: myProfile.job + " (나)", badge: "나" },
     { name: "박보검", role: "배우 · 남자 출연자", badge: "입주자" },
     { name: "차은우", role: "아티스트 · 남자 출연자", badge: "입주자" },
     { name: "NCT WISH 유우시", role: "아이돌 · 남자 출연자", badge: "입주자" },
